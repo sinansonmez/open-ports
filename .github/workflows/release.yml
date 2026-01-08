@@ -19,6 +19,9 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Run tests
+        run: make test
+
       - name: Build archives
         run: make archives
 
@@ -26,6 +29,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            CHANGELOG.md
             dist/open-ports_*.tar.gz
             dist/open-ports_*.zip
             dist/SHA256SUMS.txt

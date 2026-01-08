@@ -148,11 +148,11 @@ func main() {
 				statusBar.SetText("[yellow]Selected port has no PID to kill.")
 				return nil
 			}
-			if err := syscall.Kill(int(selected.pid), syscall.SIGTERM); err != nil {
+			if err := killProcess(int(selected.pid)); err != nil {
 				statusBar.SetText(fmt.Sprintf("[red]Failed to kill PID %d: %v", selected.pid, err))
 				return nil
 			}
-			statusBar.SetText(fmt.Sprintf("[green]Sent SIGTERM to PID %d on port %d.", selected.pid, selected.port))
+			statusBar.SetText(fmt.Sprintf("[green]Sent terminate request to PID %d on port %d.", selected.pid, selected.port))
 			refresh()
 			return nil
 		}

@@ -19,6 +19,10 @@ Run the CLI to see available commands and flags:
 open-ports -h
 ```
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## Development
 
 Build and run the CLI locally:
