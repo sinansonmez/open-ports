@@ -112,15 +112,18 @@ func main() {
 		SetDynamicColors(true).
 		SetTextAlign(tview.AlignLeft)
 
+	var ports []portInfo
+
 	refresh := func() {
 		table.Clear()
-		ports, err := loadPorts()
+		var err error
+		ports, err = loadPorts()
 		if err != nil {
 			statusBar.SetText(fmt.Sprintf("[red]Failed to load ports: %v", err))
 			fillTable(table, nil)
 			return
 		}
-		statusBar.SetText(fmt.Sprintf("[green]Found %d open ports. [white](r)efresh  (q)uit", len(ports)))
+		statusBar.SetText(fmt.Sprintf("[green]Found %d open ports. [white](r)efresh  (k)ill  (q)uit", len(ports)))
 		fillTable(table, ports)
 	}
 
@@ -132,6 +135,24 @@ func main() {
 			app.Stop()
 			return nil
 		case 'r':
+			refresh()
+			return nil
+		case 'k':
+			row, _ := table.GetSelection()
+			if row <= 0 || row-1 >= len(ports) {
+				statusBar.SetText("[yellow]Select a port to kill.")
+				return nil
+			}
+			selected := ports[row-1]
+			if selected.pid <= 0 {
+				statusBar.SetText("[yellow]Selected port has no PID to kill.")
+				return nil
+			}
+			if err := syscall.Kill(int(selected.pid), syscall.SIGTERM); err != nil {
+				statusBar.SetText(fmt.Sprintf("[red]Failed to kill PID %d: %v", selected.pid, err))
+				return nil
+			}
+			statusBar.SetText(fmt.Sprintf("[green]Sent SIGTERM to PID %d on port %d.", selected.pid, selected.port))
 			refresh()
 			return nil
 		}
