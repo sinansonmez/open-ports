@@ -39,7 +39,7 @@ archives: bundle
 	tar -C $(DIST_DIR)/linux/arm64 -czf $(DIST_DIR)/$(APP_NAME)_linux_arm64.tar.gz $(APP_NAME)
 	zip -j $(DIST_DIR)/$(APP_NAME)_windows_amd64.zip $(DIST_DIR)/windows/amd64/$(APP_NAME).exe
 	zip -j $(DIST_DIR)/$(APP_NAME)_windows_arm64.zip $(DIST_DIR)/windows/arm64/$(APP_NAME).exe
-	@if command -v shasum >/dev/null 2>&1; then shasum -a 256 $(DIST_DIR)/$(APP_NAME)_* > $(DIST_DIR)/SHA256SUMS.txt; else sha256sum $(DIST_DIR)/$(APP_NAME)_* > $(DIST_DIR)/SHA256SUMS.txt; fi
+	@cd $(DIST_DIR) && if command -v shasum >/dev/null 2>&1; then shasum -a 256 $(APP_NAME)_* > SHA256SUMS.txt; else sha256sum $(APP_NAME)_* > SHA256SUMS.txt; fi
 
 release: archives
 	@if [ -z "$(TAG)" ]; then echo "TAG is required (e.g., make release TAG=v1.0.0)"; exit 1; fi
