@@ -19,6 +19,12 @@ Run the CLI to see available commands and flags:
 open-ports -h
 ```
 
+Sort by a specific field (default: process):
+
+```sh
+open-ports -sort process
+```
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.

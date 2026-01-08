@@ -1,8 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"sort"
+	"os"
 	"strconv"
 	"strings"
 	"syscall"
@@ -22,7 +23,7 @@ type portInfo struct {
 	status   string
 }
 
-func loadPorts() ([]portInfo, error) {
+func loadPorts(sortKey portSortKey) ([]portInfo, error) {
 	conns, err := net.Connections("inet")
 	if err != nil {
 		return nil, err
@@ -63,12 +64,7 @@ func loadPorts() ([]portInfo, error) {
 		})
 	}
 
-	sort.Slice(ports, func(i, j int) bool {
-		if ports[i].port == ports[j].port {
-			return ports[i].protocol < ports[j].protocol
-		}
-		return ports[i].port < ports[j].port
-	})
+	sortPorts(ports, sortKey)
 
 	return ports, nil
 }
@@ -103,6 +99,14 @@ func fillTable(table *tview.Table, ports []portInfo) {
 }
 
 func main() {
+	sortFlag := flag.String("sort", defaultSortLabel, "Sort by: "+validSortKeys)
+	flag.Parse()
+	sortKey, err := parseSortKey(*sortFlag)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
+
 	app := tview.NewApplication()
 	table := tview.NewTable().
 		SetFixed(1, 0).
@@ -117,13 +121,13 @@ func main() {
 	refresh := func() {
 		table.Clear()
 		var err error
-		ports, err = loadPorts()
+		ports, err = loadPorts(sortKey)
 		if err != nil {
 			statusBar.SetText(fmt.Sprintf("[red]Failed to load ports: %v", err))
 			fillTable(table, nil)
 			return
 		}
-		statusBar.SetText(fmt.Sprintf("[green]Found %d open ports. [white](r)efresh  (k)ill  (q)uit", len(ports)))
+		statusBar.SetText(fmt.Sprintf("[green]Found %d open ports. [white]sort: %s  (r)efresh  (k)ill  (q)uit", len(ports), sortKeyLabel(sortKey)))
 		fillTable(table, ports)
 	}
 
