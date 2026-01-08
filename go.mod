@@ -1,4 +1,4 @@
-module open-ports
+module github.com/sinansonmez/open-ports
 
 go 1.25.1
 
